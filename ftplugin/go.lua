@@ -1,51 +1,32 @@
--- ~/.config/lvim/ftplugin/go.lua
-
-local dap_install = require "dap-install"
-dap_install.config("go_delve", {})
-
-local dap = require "dap"
-dap.adapters.go = {
-  type = 'executable';
-  command = 'node';
-  args = {os.getenv('HOME') .. '/vscode-go/dist/debugAdapter.js'}; -- specify the path to the adapter
-}
-dap.configurations.go = {
-  {
-    type = "go",
-    name = "Attach",
-    request = "attach",
-    processId = require("dap.utils").pick_process,
-    program = "${workspaceFolder}",
-    dlvToolPath = vim.fn.exepath('dlv')
-  },
-  {
-    type = "go",
-    name = "Debug curr file",
-    request = "launch",
-    program = "${file}",
-    dlvToolPath = vim.fn.exepath('dlv')
-  },
-  {
-    type = "go",
-    name = "Debug",
-    request = "launch",
-    program = "${workspaceFolder}",
-    dlvToolPath = vim.fn.exepath('dlv')
-  },
-  {
-    type = "go",
-    name = "Debug curr test",
-    request = "launch",
-    mode = "test",
-    program = "${file}",
-    dlvToolPath = vim.fn.exepath('dlv')
-  },
-  {
-    type = "go",
-    name = "Debug test",
-    request = "launch",
-    mode = "test",
-    program = "${workspaceFolder}",
-    dlvToolPath = vim.fn.exepath('dlv')
+local opts = {
+  settings = {
+    gopls = {
+      gofumpt = true, -- A stricter gofmt
+      codelenses = {
+        gc_details = true, -- Toggle the calculation of gc annotations
+        generate = true, -- Runs go generate for a given directory
+        regenerate_cgo = true, -- Regenerates cgo definitions
+        test = true,
+        tidy = true, -- Runs go mod tidy for a module
+        upgrade_dependency = true, -- Upgrades a dependency in the go.mod file for a module
+        vendor = true, -- Runs go mod vendor for a module
+      },
+      diagnosticsDelay = "300ms",
+      experimentalWatchedFileDelay = "100ms",
+      symbolMatcher = "fuzzy",
+      completeUnimported = true,
+      staticcheck = true,
+      matcher = "Fuzzy",
+      usePlaceholders = true, -- enables placeholders for function parameters or struct fields in completion responses
+      analyses = {
+        fieldalignment = true, -- find structs that would use less memory if their fields were sorted
+        nilness = true, -- check for redundant or impossible nil comparisons
+        shadow = true, -- check for possible unintended shadowing of variables
+        unusedparams = true, -- check for unused parameters of functions
+        unusedwrite = true, -- checks for unused writes, an instances of writes to struct fields and arrays that are never read
+      },
+    },
   },
 }
+
+require("lvim.lsp.manager").setup("gopls", opts)
